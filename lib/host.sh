@@ -76,6 +76,31 @@ check_program_available() {
 	fi
 }
 
+check_program_available_by_grep() {
+	local testcmd="$1"
+	local filename="$2"
+	
+	debug "Checking if '$filename' is available by running '$1'"
+
+	if eval "$testcmd" | grep $filename 2>&1; then
+		debug "'$filename' is available and looks good"
+		# Eeeexcellent...
+		return 0
+	fi
+	
+	debug "'$filename' does not appear to be available"
+	
+	install_program_in_host "$2"
+	
+	hash -r
+	
+	if ! eval "$testcmd" | grep $filename 2>&1; then
+		fatal "The program '$filename' does not appear to be available,
+		      and I could not automatically install a suitable package
+		      to supply it.  Please install it manually."
+	fi
+}
+
 # Default implementation of the `install_program_in_host` function.  Host OS
 # plugins should *definitely* reimplement this themselves.
 #
