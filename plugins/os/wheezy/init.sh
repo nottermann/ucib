@@ -30,7 +30,7 @@ os_wheezy_plugin_usage() {
 register_usage "os_wheezy_plugin_usage"
 
 parseopt "arch" "true" "amd64"
-parseopt "apt-mirrors" "true" "http://ftp.us.debian.org/debian/"
+parseopt "apt-mirrors" "true" "http://ftp.au.debian.org/debian"
 first_mirror="$(echo "${OPTS[apt-mirrors]}" | cut -d ' ' -f 1)"
 parseopt "debootstrap-mirror" "true" "$first_mirror"
 parseopt "proxy" "true"

@@ -92,9 +92,9 @@ run_cleanups() {
 	
 	set +e
 	
-	while [ "${#CLEANUP_FUNCTIONS[@]}" -gt "0" ] && [ "${CLEANUP_FUNCTIONS[-1]}" != "$upto" ]; do
+	while [ "${#CLEANUP_FUNCTIONS[@]}" -gt "0" ] && [ "${CLEANUP_FUNCTIONS[*]: -1}" != "$upto" ]; do
 		# Worst.  Pop().  Ever.
-		func="${CLEANUP_FUNCTIONS[-1]}"
+		func="${CLEANUP_FUNCTIONS[*]: -1}"
 		unset CLEANUP_FUNCTIONS[${#CLEANUP_FUNCTIONS[@]}-1]
 		debug "Running cleanup function $func"
 		$func

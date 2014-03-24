@@ -6,7 +6,7 @@ debug "Mount list is ${mount_list[@]}"
 
 cleanup_mount_filesystem() {
 	while [ "${#mount_list[@]}" -gt "0" ]; do
-		p="${mount_list[-1]}"
+		p="${mount_list[*]: -1}"
 		unset mount_list[${#mount_list[@]}-1]
 		debug "Unmounting '${TARGET}$p'"
 		umount "${TARGET}$p"
