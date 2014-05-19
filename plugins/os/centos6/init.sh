@@ -26,9 +26,6 @@ if optval proxy >/dev/null; then
 	export http_proxy="$(optval proxy)"
 fi
 
-load_plugin_or_die "partitioner/full-disk"
-load_plugin_or_die "misc/ext4-filesystem"
-
 install_packages_in_target() {
 	run_in_target yum install -y "$@" | spin "Installing $*"
 }

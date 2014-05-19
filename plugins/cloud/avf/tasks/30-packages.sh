@@ -1,0 +1,6 @@
+install_package_containing "/sbin/mount.nfs" | spin "Installing NFS client"
+install_packages_in_target "lsb-release" | spin "Installing Lsb-Release"
+install_packages_in_target "psmisc" | spin "Installing Pmisc"
+install_packages_in_target "less" | spin "Installing Less"
+install_packages_in_target "vim" | spin "Installing Vim"
+install_packages_in_target "emacs" | spin "Installing Emacs"

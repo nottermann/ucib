@@ -1,5 +1,8 @@
 # The list of mount points, in shortest-to-longest order, so we mount them
 # correctly inside one another
+
+debug "PARTITIONS ARRAY is ${PARTITIONS[@]}"
+
 mount_list=($(for k in "${!PARTITIONS[@]}"; do echo "$k"; done | awk '{ print length(), $1 }' | sort -n | cut -d ' ' -f 2))
 
 debug "Mount list is ${mount_list[@]}"
@@ -18,6 +21,7 @@ register_cleanup "cleanup_mount_filesystem"
 for part in "${mount_list[@]}"; do
 	if ! [[ "$part" =~ ^/ ]]; then
 		# Not a mountable filesystem
+		debug "${part} is not a mountable filesystem."
 		continue
 	fi
 	

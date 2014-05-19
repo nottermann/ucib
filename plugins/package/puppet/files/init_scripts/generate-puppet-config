@@ -1,0 +1,71 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:       generate-puppet-config
+# Required-Start: $local_fs
+# Required-Stop:  
+# Should-Start:   
+# Should-Stop:    
+# Default-Start:  0 1 2 3 4 5 6
+# Default-Stop:
+# Description:    Generate initial puppet configuration
+### END INIT INFO
+
+MDS="http://[fc0f::fee]/server-metadata/"
+
+mds() {
+        local path="$1"
+        wget -qO - "$MDS/$path"
+}
+
+log() {
+        local p="$(basename $0)"
+        
+        logger -t $p "$@"
+}
+
+puppetserver="$(mds puppet/server)"
+
+if [ -z "$puppetserver" ]; then
+        log "No puppet server found; exiting"
+        exit 0
+fi
+
+log "Setting Puppet server to $puppetserver"
+sed -i "s/PUPPETSERVER/$puppetserver/" /etc/puppet/puppet.conf
+
+mkdir -p /var/lib/puppet/ssl/certs
+
+if [ -n "$(mds puppet/ca)" ]; then
+        log "Setting puppet CA cert"
+        mds puppet/ca >/var/lib/puppet/ssl/certs/ca.pem
+fi
+
+if [ -n "$(mds puppet/cert)" ]; then
+        mkdir -p /var/lib/puppet/ssl/certs
+        log "Setting puppet client cert"
+        mds puppet/cert >/var/lib/puppet/ssl/certs/$(hostname -f).pem
+fi
+
+if [ -n "$(mds puppet/key)" ]; then
+        mkdir -p /var/lib/puppet/ssl/certs
+        log "Setting puppet client private key"
+        mds puppet/key >/var/lib/puppet/ssl/private_keys/$(hostname -f).pem
+fi
+
+# Now... run ourselves some Puppet!
+i=0
+
+while [ "$i" -lt "5" ]; do
+        puppetd --test --detailed-exitcodes
+        if [ "$?" != "0" ]; then
+                echo "Not converged yet; let's try again"
+        else
+                break
+        fi
+        i=$(($i+1))
+done
+
+if [ "$i" = "5" ]; then
+        echo "PUPPET FAILED TO CONVERGE.  THIS SUCKS."
+fi
+
